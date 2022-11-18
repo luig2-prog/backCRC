@@ -1,15 +1,13 @@
 package com.back.crc.utils;
 
-public class Operations<residuos> {
+public class OperationReceptor {
 
-    private String d;
+    private String TX;
     private String g;
-    private String r;
-    
     private String crc;
-    private String residuos;
-    private String[] residuosArr;
-    private String resTX;
+    private char[] residuos;
+    
+    private String resultCRC;
     
     private char[] minuendoE; //Este es el array que acumula los diferentes minuendos del emisor; se sabe que g bendría siendp el sustraendo
     private char[] minuendoR; //Este es el array que acumula los diferentes minuendos del receptor; se sabe que g bendría siendp el sustraendo
@@ -19,33 +17,24 @@ public class Operations<residuos> {
     private char[] subArray;
     private char[] arrayR;
     private String result;
-    
-   
    
     
     
-    public String getR() {
-		return r;
+    
+    public String getResultCRC() {
+		return resultCRC;
 	}
 
-	public void setR(String r) {
-		this.r = r;
+	public void setResultCRC(String resultCRC) {
+		this.resultCRC = resultCRC;
 	}
 
-	public String getResTX() {
-		return resTX;
-	}
-
-	public void setResTX(String resTX) {
-		this.resTX = resTX;
-	}
-
-	public String getD() {
-        return d;
+	public String getTX() {
+        return TX;
     }
 
-    public void setD(String d) {
-        this.d = d;
+    public void setTX(String tx) {
+        this.TX = tx;
     }
 
     public String getG() {
@@ -109,7 +98,6 @@ public class Operations<residuos> {
         for (int i = 0; i < getG().length() - 1; i++) {
             var = var + "0";
         }
-        setR(var);
         return var;
     }
     
@@ -119,101 +107,28 @@ public class Operations<residuos> {
     }
 
     public int nDigitDR() { //Cantidad de digitos que tiene D + R
-        arrayDigitDR = (getD() + digitR()).toCharArray();
+        arrayDigitDR = (getTX()).toCharArray();
         return arrayDigitDR.length;
-    }
-
-    public String emisor() {
-    	
-    	residuosArr = new String[100];
-        arrayDigitDR = (getD() + digitR()).toCharArray();
-        String subChain = (getD() + digitR()).substring(0, nDigitG());
-        arrayDigitG = getG().toCharArray();
-        int count = nDigitG() - 1;
-        result = "";
-        String acumular = "";
-        String minuendos = "";
-        int arraT = 0;
-        String prueb = "";
-        while (count < nDigitDR()) {
-            String chain = "";
-            subArray = subChain.toCharArray();
-            if (subArray.length == nDigitG()) {
-                result = result + "1";
-                
-                minuendos+=subChain;
-                minuendoE=minuendos.toCharArray();
-                for (int j = 0; j < nDigitG(); j++) {
-                    if (subArray[j] == arrayDigitG[j]) {
-                        chain += "0";
-                    } else {
-                        chain += "1";
-                    }
-                }
-                acumular = acumular + chain;
-                if (count == nDigitDR() - 1) {
-                    return acumular + chain;
-                }
-
-                if (count < nDigitDR()) {
-                    chain = chain + arrayDigitDR[count + 1];
-                    acumular = acumular + arrayDigitDR[count + 1];
-                }
-
-            } else {
-
-                String var = subChain + arrayDigitDR[count];// para cuando el indice 0 de subArray sea 0 (Validar)
-                if (count + 1 < nDigitDR()) {
-                    acumular = acumular + arrayDigitDR[count + 1];
-                }
-                if (subArray.length < nDigitG() || var.equals("0")) {
-                    result = result + "0";
-                }
-                if (count + 1 < nDigitDR()) {
-                    subArray = (subChain + arrayDigitDR[count + 1]).toCharArray();
-                    chain = subChain + arrayDigitDR[count + 1];
-                }
-            }
-
-            int index = chain.indexOf('1');
-            if (index == -1) {
-                chain = "";
-            } else {
-                chain = chain.substring(index);
-            }
-            subChain = chain;
-            subArray = subChain.toCharArray();
-            prueb = acumular;
-            setResiduosArr(arraT, prueb);
-//            System.out.print(count);
-            prueb = "";
-            arraT++;
-            count++;
-
-//            acumular = "";
-        }
-        return acumular;                //Retorna una cadena acumulada de los diferentes reciduos
-        
     }
 
     public String CRC() {
         String crc = "";
-        String var = emisor();
-        char array[] = emisor().toCharArray();
+        String var = receptor();
+        char array[] = receptor().toCharArray();
         int tam = array.length;
         crc = var.substring(tam - nDigitR());
         
         return crc;
     }
 
-    public String TX() { //TRAMA
-        return d + CRC();
-    }
+//    public String TX() { //TRAMA
+//        return d + CRC();
+//    }
 
     public String receptor() {
-        char arrayTX[] = TX().toCharArray();
+        char arrayTX[] = getTX().toCharArray();
         String CRC = "";
-        String subChain = TX().substring(0, nDigitG());
+        String subChain = getTX().substring(0, nDigitG());
         arrayDigitG = getG().toCharArray();
         int nDigitTX = arrayTX.length;
         int count = nDigitG() - 1;
@@ -288,23 +203,17 @@ public class Operations<residuos> {
 
     }
     public void mostrar(){
-
-        residuos = emisor();
+        String acumulados = new String(minuendoE);
+        System.out.println(acumulados);
+        residuos = minuendoE;
+        
     }
 
-	public String getResiduos() {
+	public char[] getResiduos() {
 		return residuos;
 	}
 
-	public void setResiduos(String residuos) {
+	public void setResiduos(char[] residuos) {
 		this.residuos = residuos;
-	}
-
-	public String[] getResiduosArr() {
-		return residuosArr;
-	}
-
-	public void setResiduosArr(int pos, String residuosArr) {
-		this.residuosArr[pos] = residuosArr;
 	}
 }
